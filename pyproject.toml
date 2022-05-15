@@ -13,7 +13,7 @@ packages = [
 ]
 
 [tool.poetry.scripts]
-xcsv_plot = "xcsv.plot:main"
+xcsv_plot = "xcsv.plot.__main__:main"
 
 [tool.poetry.dependencies]
 python = "^3.8"
