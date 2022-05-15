@@ -1,0 +1,28 @@
+[tool.poetry]
+name = "xcsv-plot"
+version = "0.1.0"
+description = "Subpackage for plotting extended CSV (XCSV) files"
+authors = ["Paul Breen <pbree@bas.ac.uk>"]
+readme = "README.md"
+license = "Apache-2.0"
+repository = "https://github.com/paul-breen/xcsv-plot"
+homepage = "https://github.com/paul-breen/xcsv-plot"
+documentation = "https://github.com/paul-breen/xcsv-plot/blob/main/README.md"
+packages = [
+  {include = "xcsv/plot"}
+]
+
+[tool.poetry.scripts]
+xcsv_plot = "xcsv.plot:main"
+
+[tool.poetry.dependencies]
+python = "^3.8"
+xcsv = "^0.2.0"
+matplotlib = "^3.5.2"
+
+[tool.poetry.dev-dependencies]
+pytest = "^5.2"
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
