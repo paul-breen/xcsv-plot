@@ -55,12 +55,12 @@ Calling the script with the `--help` option will show the following usage:
 
 ```bash
 $ python3 -m xcsv.plot --help
-usage: __main__.py [-h] [-x XIDX | -X XCOL] [-y YIDX | -Y YCOL]
-                   [--x-label XLABEL] [--y-label YLABEL] [--invert-x-axis]
-                   [--invert-y-axis] [--title TITLE] [--caption CAPTION]
-                   [--label-key LABEL_KEY] [-s FIGSIZE FIGSIZE]
-                   [-b BG_IMG_PATH] [-o OUT_FILE]
-                   in_file [in_file ...]
+usage: xcsv_plot [-h] [-x XIDX | -X XCOL] [-y YIDX | -Y YCOL]
+                 [--x-label XLABEL] [--y-label YLABEL] [--invert-x-axis]
+                 [--invert-y-axis] [--title TITLE] [--caption CAPTION]
+                 [--label-key LABEL_KEY] [-s FIGSIZE FIGSIZE] [-b BG_IMG_PATH]
+                 [-o OUT_FILE] [-P PLOT_OPTS] [-S] [-V]
+                 in_file [in_file ...]
 
 plot the given XCSV files
 
@@ -94,6 +94,11 @@ optional arguments:
                         path to an image to show in the background of the plot
   -o OUT_FILE, --out-file OUT_FILE
                         output plot file
+  -P PLOT_OPTS, --plot-options PLOT_OPTS
+                        options for the plot, specified as a simple JSON
+                        object
+  -S, --scatter-plot    set plot options (see -P) to produce a scatter plot
+  -V, --version         show program's version number and exit
 
 Examples
 
