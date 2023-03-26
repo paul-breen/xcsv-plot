@@ -131,7 +131,7 @@ class Plot(object):
         if ylabel:
             ax.set_ylabel(ylabel)
 
-    def plot_data(self, fig, ax, dataset, xcol, ycol, label=None, color='C0', invert_xaxis=False, invert_yaxis=False):
+    def plot_data(self, fig, ax, dataset, xcol, ycol, label=None, invert_xaxis=False, invert_yaxis=False, opts={}):
         """
         Plot the data for the given dataset
 
@@ -153,18 +153,18 @@ class Plot(object):
         :param label: A unique label to identify this data series in the plot
         legend.  This will most likely be a header item from the XCSV header
         :type label: str
-        :param color: A unique color to identify this data series
-        :type color: str
         :param invert_xaxis: Invert the x-axis
         :type invert_xaxis: bool
         :param invert_yaxis: Invert the y-axis
         :type invert_yaxis: bool
+        :param opts: Option kwargs to apply to all plots (e.g., color, marker)
+        :type opts: dict
         """
   
         if xcol:
-            ax.plot(dataset.data[xcol], dataset.data[ycol], label=label, color=color)
+            ax.plot(dataset.data[xcol], dataset.data[ycol], label=label, **opts)
         else:
-            ax.plot(dataset.data[ycol], label=label, color=color)
+            ax.plot(dataset.data[ycol], label=label, **opts)
 
         if invert_xaxis:
             ax.invert_xaxis()
@@ -248,7 +248,7 @@ class Plot(object):
         self.fig = plt.figure(figsize=figsize)
         self.axs.append(self.fig.add_subplot())
 
-    def plot_datasets(self, datasets, fig=None, axs=None, axs_idx=0, xcol=None, ycol=None, xidx=None, yidx=0, xlabel=None, ylabel=None, title=None, title_wrap=True, caption=None, label_key=None, invert_xaxis=False, invert_yaxis=False, show=True):
+    def plot_datasets(self, datasets, fig=None, axs=None, axs_idx=0, xcol=None, ycol=None, xidx=None, yidx=0, xlabel=None, ylabel=None, title=None, title_wrap=True, caption=None, label_key=None, invert_xaxis=False, invert_yaxis=False, show=True, opts={}):
         """
         Plot the data for the given datasets
 
@@ -302,6 +302,8 @@ class Plot(object):
         :type invert_yaxis: bool
         :param show: Show the plot
         :type show: bool
+        :param opts: Option kwargs to apply to all plots (e.g., color, marker)
+        :type opts: dict
         """
  
         if fig:
@@ -316,6 +318,7 @@ class Plot(object):
         self.datasets = datasets
         self.xcol = xcol
         self.ycol = ycol
+        generate_colors = True
 
         if not title:
             title = self.get_metadata_item_value(datasets[0], self.DEFAULTS['title_key'])
@@ -339,13 +342,19 @@ class Plot(object):
         if not ylabel:
             ylabel = self.ycol
 
+        if 'color' in opts:
+            generate_colors = False
+
         self.fig.suptitle(title, wrap=title_wrap)
         self.setup_data_plot(self.fig, self.axs[axs_idx], caption=caption, xlabel=xlabel, ylabel=ylabel)
 
         for i, dataset in enumerate(datasets):
             label = self.get_metadata_item_value(dataset, label_key)
-            color = f'C{i}'
-            self.plot_data(self.fig, self.axs[axs_idx], dataset, self.xcol, self.ycol, label=label, color=color, invert_xaxis=invert_xaxis, invert_yaxis=invert_yaxis)
+
+            if generate_colors:
+                opts.update({'color': f'C{i}'})
+
+            self.plot_data(self.fig, self.axs[axs_idx], dataset, self.xcol, self.ycol, label=label, invert_xaxis=invert_xaxis, invert_yaxis=invert_yaxis, opts=opts)
 
         if show:
             plt.show()
