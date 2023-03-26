@@ -8,7 +8,7 @@ import xcsv.plot as xp
 base = os.path.dirname(__file__)
 
 def test_version():
-    assert xp.__version__ == '0.1.0'
+    assert xp.__version__ == '0.2.0'
 
 @pytest.fixture
 def short_test_datasets():
