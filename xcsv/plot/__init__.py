@@ -62,39 +62,6 @@ class Plot(object):
 
         return extent
 
-    def get_metadata_item_value(self, dataset, key, section='header'):
-        """
-        Get the value of the given key from the metadata dict of the given
-        dataset, or the empty string if not found
-
-        If the value is a list, then its elements are joined into a
-        newline-separated string, as it would appear in the original file
-
-        By default, the key is looked for in the 'header' section.  Set
-        section='column_headers' to look in the 'column_headers' section
-        instead.
-
-        :param dataset: The dataset to query
-        :type dataset: XCSV object
-        :param key: The header item key
-        :type key: str
-        :param section: The metadata section.
-        One of ['header','column_headers']
-        :type section: str
-        :returns: The value of the given key or the empty string if not found
-        :rtype: str
-        """
-
-        try:
-            value = dataset.metadata[section][key]
-
-            if isinstance(value, list):
-                value = '\n'.join(value)
-        except KeyError:
-            value = ''
-
-        return value
-
     def setup_data_plot(self, fig, ax, xlabel=None, ylabel=None, caption=None, caption_x=0.1, caption_y=0.02, caption_wrap=True, subplots_adjust_bottom=0.15):
         """
         Setup the data plot
@@ -321,10 +288,10 @@ class Plot(object):
         generate_colors = True
 
         if not title:
-            title = self.get_metadata_item_value(datasets[0], self.DEFAULTS['title_key'])
+            title = datasets[0].get_metadata_item_value(self.DEFAULTS['title_key'])
 
         if not caption:
-            caption = self.get_metadata_item_value(datasets[0], self.DEFAULTS['caption_key'])
+            caption = datasets[0].get_metadata_item_value(self.DEFAULTS['caption_key'])
 
         if not label_key:
             label_key = self.DEFAULTS['label_key']
@@ -349,7 +316,7 @@ class Plot(object):
         self.setup_data_plot(self.fig, self.axs[axs_idx], caption=caption, xlabel=xlabel, ylabel=ylabel)
 
         for i, dataset in enumerate(datasets):
-            label = self.get_metadata_item_value(dataset, label_key)
+            label = dataset.get_metadata_item_value(label_key)
 
             if generate_colors:
                 opts.update({'color': f'C{i}'})

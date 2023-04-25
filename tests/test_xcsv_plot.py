@@ -35,32 +35,6 @@ def test_get_plot_data_extent_no_xcol(short_test_datasets):
     actual = p.get_plot_data_extent(short_test_datasets, xcol, ycol)
     assert actual == expected
 
-def test_get_metadata_item_value(short_test_datasets):
-    p = xp.Plot()
-    expected = '1'
-    actual = p.get_metadata_item_value(short_test_datasets[0], 'id')
-    assert actual == expected
-
-def test_get_metadata_item_value_different_section(short_test_datasets):
-    p = xp.Plot()
-    expected = {'name': 'depth', 'units': 'm', 'notes': None}
-    actual = p.get_metadata_item_value(short_test_datasets[0], 'depth (m)', section='column_headers')
-    assert actual == expected
-
-def test_get_metadata_item_value_list_item(short_test_datasets):
-    # List items are converted into a newline-separated string
-    p = xp.Plot()
-    expected = 'This dataset...\nThe second summary paragraph.\nThe third summary paragraph.  Escaped because it contains the delimiter in a URL https://dummy.domain'
-    actual = p.get_metadata_item_value(short_test_datasets[0], 'summary')
-    assert actual == expected
-
-def test_get_metadata_item_value_non_existent_key(short_test_datasets):
-    # If a key doesn't exist, the empty string is returned instead
-    p = xp.Plot()
-    expected = ''
-    actual = p.get_metadata_item_value(short_test_datasets[0], 'non-existent')
-    assert actual == expected
-
 def test_plot_datasets(short_test_datasets):
     p = xp.Plot()
 
