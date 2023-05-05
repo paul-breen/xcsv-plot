@@ -34,6 +34,11 @@ class Plot(object):
         self.datasets = []
         self.xcol = None
         self.ycol = None
+        self.xlabel = None
+        self.ylabel = None
+        self.title = None
+        self.caption = None
+        self.label_key = None
 
     def get_plot_data_extent(self, datasets, xcol, ycol):
         """
@@ -226,6 +231,127 @@ class Plot(object):
         self.fig = plt.figure(figsize=figsize)
         self.axs.append(self.fig.add_subplot())
 
+    def _setup_fallback_figure_and_axes(self, fig=None, axs=None):
+        """
+        Setup a fallback figure and axes array
+
+        This calls setup_figure_and_axes() if it hasn't already beeen called
+
+        :param fig: The figure object
+        :type fig: matplotlib.figure.Figure
+        :param axs: The axes array
+        :type axs: matplotlib.axes.Axes
+        """
+
+        if fig:
+            self.fig = fig
+
+        if axs:
+            self.axs = axs
+
+        if not self.fig or not self.axs:
+            self.setup_figure_and_axes()
+
+    def _store_figure_parameters(self, datasets, xcol=None, ycol=None, xidx=None, yidx=0, xlabel=None, ylabel=None, title=None, caption=None, label_key=None):
+        """
+        Store the parameters for the figure
+
+        Either the xcol and ycol column header labels, or the xidx and yidx
+        column indices, can be specified.  These are mutually exclusive.
+
+        :param datasets: A list of XCSV objects containing the input datasets
+        :type datasets: list
+        :param xcol: The x-axis data column header label
+        :type xcol: str
+        :param ycol: The y-axis data column header label
+        :type ycol: str
+        :param xidx: The x-axis data column index
+        :type xidx: int
+        :param yidx: The y-axis data column index
+        :type yidx: int
+        :param xlabel: The x-axis label text
+        :type xlabel: str
+        :param ylabel: The y-axis label text
+        :type ylabel: str
+        :param title: The figure title text
+        :type title: str
+        :param caption: The figure caption text
+        :type caption: str
+        :param label_key: The key of a header item in the XCSV header to be
+        used as a unique label to identify each data series in the plot legend
+        :type label_key: str
+        """
+
+        self.datasets = datasets
+        self.xcol = xcol
+        self.ycol = ycol
+        self.xlabel = xlabel
+        self.ylabel = ylabel
+        self.title = title
+        self.caption = caption
+        self.label_key = label_key
+
+        if not title:
+            self.title = datasets[0].get_metadata_item_value(self.DEFAULTS['title_key'])
+
+        if not caption:
+            self.caption = datasets[0].get_metadata_item_value(self.DEFAULTS['caption_key'])
+
+        if not label_key:
+            self.label_key = self.DEFAULTS['label_key']
+
+        if not xcol:
+            if xidx is not None:
+                self.xcol = datasets[0].data.iloc[:, xidx].name
+
+        if not ycol:
+            self.ycol = datasets[0].data.iloc[:, yidx].name
+
+        if not xlabel:
+            self.xlabel = self.xcol
+
+        if not ylabel:
+            self.ylabel = self.ycol
+
+    def _add_figure_annotations(self, axs_idx=0):
+        """
+        Add annotations to the figure
+
+        :param axs_idx: The index of the axis object in the axs array
+        :type axs_idx: int
+        """
+
+        self.add_figure_title(self.title)
+        self.add_figure_caption(self.caption)
+        self.setup_data_plot(self.axs[axs_idx], xlabel=self.xlabel, ylabel=self.ylabel)
+
+    def _plot_datasets(self, axs_idx=0, invert_xaxis=False, invert_yaxis=False, opts={}):
+        """
+        Plot the data for the figure datasets
+
+        :param axs_idx: The index of the axis object in the axs array
+        :type axs_idx: int
+        :param invert_xaxis: Invert the x-axis
+        :type invert_xaxis: bool
+        :param invert_yaxis: Invert the y-axis
+        :type invert_yaxis: bool
+        :param opts: Option kwargs to apply to all plots (e.g., color, marker)
+        :type opts: dict
+        """
+
+        generate_colors = True
+
+        if 'color' in opts:
+            generate_colors = False
+
+        for i, dataset in enumerate(self.datasets):
+            label = dataset.get_metadata_item_value(self.label_key)
+
+            if generate_colors:
+                opts.update({'color': f'C{i}'})
+
+            self.plot_data(self.axs[axs_idx], dataset, self.xcol, self.ycol, label=label, invert_xaxis=invert_xaxis, invert_yaxis=invert_yaxis, opts=opts)
+
     def plot_datasets(self, datasets, fig=None, axs=None, axs_idx=0, xcol=None, ycol=None, xidx=None, yidx=0, xlabel=None, ylabel=None, title=None, caption=None, label_key=None, invert_xaxis=False, invert_yaxis=False, show=True, opts={}):
         """
         Plot the data for the given datasets
@@ -281,57 +407,11 @@ class Plot(object):
         :param opts: Option kwargs to apply to all plots (e.g., color, marker)
         :type opts: dict
         """
- 
-        if fig:
-            self.fig = fig
 
-        if axs:
-            self.axs = axs
-
-        if not self.fig or not self.axs:
-            self.setup_figure_and_axes()
-
-        self.datasets = datasets
-        self.xcol = xcol
-        self.ycol = ycol
-        generate_colors = True
-
-        if not title:
-            title = datasets[0].get_metadata_item_value(self.DEFAULTS['title_key'])
-
-        if not caption:
-            caption = datasets[0].get_metadata_item_value(self.DEFAULTS['caption_key'])
-
-        if not label_key:
-            label_key = self.DEFAULTS['label_key']
-
-        if not xcol:
-            if xidx is not None:
-                self.xcol = datasets[0].data.iloc[:, xidx].name
-
-        if not ycol:
-            self.ycol = datasets[0].data.iloc[:, yidx].name
-
-        if not xlabel:
-            xlabel = self.xcol
-
-        if not ylabel:
-            ylabel = self.ycol
-
-        if 'color' in opts:
-            generate_colors = False
-
-        self.add_figure_title(title)
-        self.add_figure_caption(caption)
-        self.setup_data_plot(self.axs[axs_idx], xlabel=xlabel, ylabel=ylabel)
-
-        for i, dataset in enumerate(datasets):
-            label = dataset.get_metadata_item_value(label_key)
-
-            if generate_colors:
-                opts.update({'color': f'C{i}'})
-
-            self.plot_data(self.axs[axs_idx], dataset, self.xcol, self.ycol, label=label, invert_xaxis=invert_xaxis, invert_yaxis=invert_yaxis, opts=opts)
+        self._setup_fallback_figure_and_axes(fig, axs)
+        self._store_figure_parameters(datasets, xcol, ycol, xidx, yidx, xlabel, ylabel, title, caption, label_key)
+        self._add_figure_annotations(axs_idx)
+        self._plot_datasets(axs_idx, invert_xaxis, invert_yaxis, opts)
 
         if show:
             plt.show()
