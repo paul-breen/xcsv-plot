@@ -62,12 +62,10 @@ class Plot(object):
 
         return extent
 
-    def add_figure_title(self, fig, title, title_wrap=True):
+    def add_figure_title(self, title, title_wrap=True):
         """
         Add a title to the figure
 
-        :param fig: The figure object
-        :type fig: matplotlib.figure.Figure
         :param title: The figure title text
         :type title: str
         :param title_wrap: Wrap the title text
@@ -76,12 +74,10 @@ class Plot(object):
 
         self.fig.suptitle(title, wrap=title_wrap)
 
-    def add_figure_caption(self, fig, caption, caption_x=0.1, caption_y=0.02, caption_wrap=True, subplots_adjust_bottom=0.15):
+    def add_figure_caption(self, caption, caption_x=0.1, caption_y=0.02, caption_wrap=True, subplots_adjust_bottom=0.15):
         """
         Add a caption to the figure
 
-        :param fig: The figure object
-        :type fig: matplotlib.figure.Figure
         :param caption: The figure caption text
         :type caption: str
         :param caption_x: An offset for the caption text in the x-direction
@@ -94,17 +90,15 @@ class Plot(object):
         :type subplots_adjust_bottom: float
         """
 
-        fig.text(caption_x, caption_y, caption, wrap=caption_wrap)
-        fig.subplots_adjust(bottom=subplots_adjust_bottom)
+        self.fig.text(caption_x, caption_y, caption, wrap=caption_wrap)
+        self.fig.subplots_adjust(bottom=subplots_adjust_bottom)
 
-    def setup_data_plot(self, fig, ax, xlabel=None, ylabel=None):
+    def setup_data_plot(self, ax, xlabel=None, ylabel=None):
         """
         Setup the data plot
 
         This sets fixed annotations, such as the x- and y-axis labels.
 
-        :param fig: The figure object
-        :type fig: matplotlib.figure.Figure
         :param ax: The axis object
         :type ax: matplotlib.axes.Axes
         :param xlabel: The x-axis label text
@@ -119,7 +113,7 @@ class Plot(object):
         if ylabel:
             ax.set_ylabel(ylabel)
 
-    def plot_data(self, fig, ax, dataset, xcol, ycol, label=None, invert_xaxis=False, invert_yaxis=False, opts={}):
+    def plot_data(self, ax, dataset, xcol, ycol, label=None, invert_xaxis=False, invert_yaxis=False, opts={}):
         """
         Plot the data for the given dataset
 
@@ -128,8 +122,6 @@ class Plot(object):
         * The ycol header label specifies the data series from the dataset's
         data table to be used for the y-axis.
 
-        :param fig: The figure object
-        :type fig: matplotlib.figure.Figure
         :param ax: The axis object
         :type ax: matplotlib.axes.Axes
         :param dataset: The dataset to plot
@@ -163,12 +155,10 @@ class Plot(object):
         if label:
             ax.legend()
 
-    def plot_data_bg(self, fig, ax, img, img_extent, aspect='auto', alpha=0.5):
+    def plot_data_bg(self, ax, img, img_extent, aspect='auto', alpha=0.5):
         """
         Plot the given image as a background for the data plot
 
-        :param fig: The figure object
-        :type fig: matplotlib.figure.Figure
         :param ax: The axis object
         :type ax: matplotlib.axes.Axes
         :param img: The image data
@@ -215,7 +205,7 @@ class Plot(object):
             img_extent = [*self.axs[axs_idx].get_xlim(), *self.axs[axs_idx].get_ylim()]
 
         if img is not None:
-            self.plot_data_bg(self.fig, self.axs[axs_idx], img, img_extent)
+            self.plot_data_bg(self.axs[axs_idx], img, img_extent)
 
     def setup_figure_and_axes(self, figsize=None):
         """
@@ -331,9 +321,9 @@ class Plot(object):
         if 'color' in opts:
             generate_colors = False
 
-        self.add_figure_title(self.fig, title)
-        self.add_figure_caption(self.fig, caption)
-        self.setup_data_plot(self.fig, self.axs[axs_idx], xlabel=xlabel, ylabel=ylabel)
+        self.add_figure_title(title)
+        self.add_figure_caption(caption)
+        self.setup_data_plot(self.axs[axs_idx], xlabel=xlabel, ylabel=ylabel)
 
         for i, dataset in enumerate(datasets):
             label = dataset.get_metadata_item_value(label_key)
@@ -341,7 +331,7 @@ class Plot(object):
             if generate_colors:
                 opts.update({'color': f'C{i}'})
 
-            self.plot_data(self.fig, self.axs[axs_idx], dataset, self.xcol, self.ycol, label=label, invert_xaxis=invert_xaxis, invert_yaxis=invert_yaxis, opts=opts)
+            self.plot_data(self.axs[axs_idx], dataset, self.xcol, self.ycol, label=label, invert_xaxis=invert_xaxis, invert_yaxis=invert_yaxis, opts=opts)
 
         if show:
             plt.show()
