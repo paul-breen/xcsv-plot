@@ -62,7 +62,42 @@ class Plot(object):
 
         return extent
 
-    def setup_data_plot(self, fig, ax, xlabel=None, ylabel=None, caption=None, caption_x=0.1, caption_y=0.02, caption_wrap=True, subplots_adjust_bottom=0.15):
+    def add_figure_title(self, fig, title, title_wrap=True):
+        """
+        Add a title to the figure
+
+        :param fig: The figure object
+        :type fig: matplotlib.figure.Figure
+        :param title: The figure title text
+        :type title: str
+        :param title_wrap: Wrap the title text
+        :type title_wrap: bool
+        """
+
+        self.fig.suptitle(title, wrap=title_wrap)
+
+    def add_figure_caption(self, fig, caption, caption_x=0.1, caption_y=0.02, caption_wrap=True, subplots_adjust_bottom=0.15):
+        """
+        Add a caption to the figure
+
+        :param fig: The figure object
+        :type fig: matplotlib.figure.Figure
+        :param caption: The figure caption text
+        :type caption: str
+        :param caption_x: An offset for the caption text in the x-direction
+        :type caption_x: float
+        :param caption_y: An offset for the caption text in the y-direction
+        :type caption_y: float
+        :param caption_wrap: Wrap the caption text
+        :type caption_wrap: bool
+        :param subplots_adjust_bottom: Add space to hold the caption
+        :type subplots_adjust_bottom: float
+        """
+
+        fig.text(caption_x, caption_y, caption, wrap=caption_wrap)
+        fig.subplots_adjust(bottom=subplots_adjust_bottom)
+
+    def setup_data_plot(self, fig, ax, xlabel=None, ylabel=None):
         """
         Setup the data plot
 
@@ -76,21 +111,7 @@ class Plot(object):
         :type xlabel: str
         :param ylabel: The y-axis label text
         :type ylabel: str
-        :param caption: The figure caption text
-        :type caption: str
-        :param caption_x: An offset for the caption text in the x-direction
-        :type caption_x: float
-        :param caption_y: An offset for the caption text in the y-direction
-        :type caption_y: float
-        :param caption_wrap: Wrap the caption text
-        :type caption_wrap: bool
-        :param subplots_adjust_bottom: Add space to hold the caption
-        :type subplots_adjust_bottom: float
         """
-
-        if caption:
-            fig.text(caption_x, caption_y, caption, wrap=caption_wrap)
-            fig.subplots_adjust(bottom=subplots_adjust_bottom)
 
         if xlabel:
             ax.set_xlabel(xlabel)
@@ -215,7 +236,7 @@ class Plot(object):
         self.fig = plt.figure(figsize=figsize)
         self.axs.append(self.fig.add_subplot())
 
-    def plot_datasets(self, datasets, fig=None, axs=None, axs_idx=0, xcol=None, ycol=None, xidx=None, yidx=0, xlabel=None, ylabel=None, title=None, title_wrap=True, caption=None, label_key=None, invert_xaxis=False, invert_yaxis=False, show=True, opts={}):
+    def plot_datasets(self, datasets, fig=None, axs=None, axs_idx=0, xcol=None, ycol=None, xidx=None, yidx=0, xlabel=None, ylabel=None, title=None, caption=None, label_key=None, invert_xaxis=False, invert_yaxis=False, show=True, opts={}):
         """
         Plot the data for the given datasets
 
@@ -256,8 +277,6 @@ class Plot(object):
         :type ylabel: str
         :param title: The figure title text
         :type title: str
-        :param title_wrap: Wrap the title text
-        :type title_wrap: bool
         :param caption: The figure caption text
         :type caption: str
         :param label_key: The key of a header item in the XCSV header to be
@@ -312,8 +331,9 @@ class Plot(object):
         if 'color' in opts:
             generate_colors = False
 
-        self.fig.suptitle(title, wrap=title_wrap)
-        self.setup_data_plot(self.fig, self.axs[axs_idx], caption=caption, xlabel=xlabel, ylabel=ylabel)
+        self.add_figure_title(self.fig, title)
+        self.add_figure_caption(self.fig, caption)
+        self.setup_data_plot(self.fig, self.axs[axs_idx], xlabel=xlabel, ylabel=ylabel)
 
         for i, dataset in enumerate(datasets):
             label = dataset.get_metadata_item_value(label_key)
