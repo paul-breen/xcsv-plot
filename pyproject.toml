@@ -17,7 +17,7 @@ xcsv_plot = "xcsv.plot.__main__:main"
 
 [tool.poetry.dependencies]
 python = "^3.8"
-xcsv = "^0.4.0"
+xcsv = "^0.4"
 matplotlib = "^3.5.2"
 
 [tool.poetry.dev-dependencies]
